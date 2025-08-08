@@ -1,0 +1,152 @@
+{
+  "name": "My first agent",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -256,
+        -48
+      ],
+      "id": "79ba77ef-a1a8-4684-98c8-03d9ce0fa20f",
+      "name": "When chat message received",
+      "webhookId": "856aa3b0-36e1-4f39-bc8f-2dbef556cd41"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a friendly and helpful assistant whose job is to help users send personalized birthday wishes via email.\n\nBegin by greeting the user and asking them for the recipient's email ID. Then collect the following details from the user:\n1. Recipient's name\n2. Recipient's email\n3. Relationship to the user (e.g., friend, colleague, client)\n4. Preferred tone (e.g., formal, casual, warm)\n5. Sender's name\n\nOnce all information is collected, generate a short, meaningful birthday email (3–5 sentences), with a subject line that includes “Happy Birthday”.\n\nFinal Output:\nReturn the result in the following JSON format:\n{\n  \"to\": \"<recipient_email>\",\n  \"subject\": \"<email_subject>\",\n  \"body\": \"<email_body>\"\n}\n\nStart the conversation with:\n\"Hi! How can I assist you today? Please provide the email ID of the person you'd like to send birthday wishes to.\"\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        -48,
+        -48
+      ],
+      "id": "c924be62-720b-4abc-a460-1b2220b05f4c",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -48,
+        176
+      ],
+      "id": "549bca34-b01f-49e0-bf35-997403524338",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "CZ32GrZZ4s21YFWZ",
+          "name": "Udhaya API"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        80,
+        176
+      ],
+      "id": "0712cbcf-42b0-4675-be4e-c0c2debc6cad",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        256,
+        128
+      ],
+      "id": "81b3e314-6060-47ed-aaae-d77d951ed433",
+      "name": "Send a message in Gmail",
+      "webhookId": "ab995c4c-a1c8-4c2d-8be6-277a980eec70",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "NreVnS6oXFDpnUSv",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "b3d6dab4-3a00-461e-aca8-0c6c69c14d5e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b1d3e0d12d68225d79d5e3accb75641b9894b530c76550be94c3f04d1958984a"
+  },
+  "id": "uu8UUVsLHocXDZn2",
+  "tags": []
+}
