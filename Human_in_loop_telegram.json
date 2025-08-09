@@ -1,0 +1,170 @@
+{
+  "name": "Human_in_loop_telegram",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Answer the query! {{ $json.message.text }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        -112,
+        -48
+      ],
+      "id": "e50dc90d-c202-4538-b358-da351fb8d816",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -256,
+        160
+      ],
+      "id": "172f8559-2982-4f8d-a714-5c96613e4f2c",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "CZ32GrZZ4s21YFWZ",
+          "name": "Udhaya API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "=telegram_{{ $json.message.chat.id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -112,
+        160
+      ],
+      "id": "d59fe3fb-01e2-4213-8852-c738e54d751d",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -352,
+        -48
+      ],
+      "id": "4c451a76-eed9-426a-be48-a90a8fe1a78a",
+      "name": "Telegram Trigger",
+      "webhookId": "20c801cf-86d7-4396-9c92-dafa98608153",
+      "credentials": {
+        "telegramApi": {
+          "id": "mpHKDVii59HlxZmU",
+          "name": "upskill_ai"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "message": "=Please review and approve the content {{ $json.output }}",
+        "options": {
+          "limitWaitTime": {
+            "values": {
+              "resumeAmount": 45,
+              "resumeUnit": "minutes"
+            }
+          },
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        -48
+      ],
+      "id": "542113cb-249b-43db-9d1a-7c273ca8e951",
+      "name": "Send a text message",
+      "webhookId": "30ea12fb-b200-4e2f-9de4-bcc17c552b4d",
+      "credentials": {
+        "telegramApi": {
+          "id": "mpHKDVii59HlxZmU",
+          "name": "upskill_ai"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2ba60dbc-a797-4d23-8925-f948d9034e99",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b1d3e0d12d68225d79d5e3accb75641b9894b530c76550be94c3f04d1958984a"
+  },
+  "id": "u1ESf0zAOXS3jmgL",
+  "tags": []
+}
